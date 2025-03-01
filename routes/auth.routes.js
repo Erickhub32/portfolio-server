@@ -25,7 +25,26 @@ router.post('/signup', (req, res, next) => {
     return
   }
 
-  res.send('Ahora comenzamos el registro')
+  User
+    .findOne({ email })
+    .then((foundUser) => {
+
+      if (foundUser) {
+        res.status(400).json({ menssage: 'User already exists' })
+        return
+      }
+
+      const salt = bcrypt.genSaltSync(saltRounds);
+      const hashPassword = bcrypt.hashSync(password, salt);
+
+      User
+        .create({ email, password: hashPassword, username })
+        .then(() => res.sendStatus(201))
+        .catch((err) => next(err))
+
+    })
+    .catch((err) => next(err))
+
 })
 
 module.exports = router;

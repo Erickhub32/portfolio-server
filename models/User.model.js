@@ -13,6 +13,14 @@ const userSchema = new Schema(
     password: {
       type: String,
       required: [true, 'Password is required.']
+    },
+
+
+    username: {
+      type: String,
+      required: [true, 'Username is required.'],
+      unique: true,
+      minLenght: [8, 'El usuario necesita mínimo 8 caracteres']
     }
   },
   {

@@ -1,6 +1,7 @@
 const router = require('express').Router();
 
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const saltRounds = 10;
 
 const User = require('../models/User.model');
@@ -45,6 +46,49 @@ router.post('/signup', (req, res, next) => {
     })
     .catch((err) => next(err))
 
+});
+
+router.post('/login', (req, res, next) => {
+
+  const { email, password } = req.body;
+
+  if (email === '' || password === '') {
+    return res.status(400).json({ menssage: 'Provid email, password' })
+
+  }
+
+  User
+    .findOne({ email })
+    .then((foundUser) => {
+      if (!foundUser) {
+        return res.status(401).json({ menssage: 'User not found' })
+      }
+
+      const passwordCorrect = bcrypt.compareSync(password, foundUser.password);
+
+      if (!passwordCorrect) {
+        return res.status(401).json({ menssage: 'Wrong password' })
+
+      }
+
+      const { _id, email, username } = foundUser;
+      const payload = { _id, email, username };
+
+      const authToken = jwt.sign(
+        payload,
+        process.env.TOKEN_SECRET,
+        { algorithm: 'HS256', expiresIn: '6h' }
+
+      );
+
+      res.json({ authToken: authToken })
+
+
+
+    })
+    .catch((err) => next(err))
+
 })
+
 
 module.exports = router;

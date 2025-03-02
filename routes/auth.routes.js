@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const saltRounds = 10;
 
 const User = require('../models/User.model');
+const isAuthenticated = require('../middleware/verifyToken');
 
 router.post('/signup', (req, res, next) => {
 
@@ -89,6 +90,11 @@ router.post('/login', (req, res, next) => {
     .catch((err) => next(err))
 
 })
+
+router.get('/verify', isAuthenticated, (req, res, next) => {
+  res.json(req.payload)
+})
+
 
 
 module.exports = router;

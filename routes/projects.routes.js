@@ -3,13 +3,14 @@ const router = require("express").Router();
 const Project = require('../models/Project.model');
 
 
-const { isAuthenticated } = require('./../middleware/verifyToken')
+const isAuthenticated = require('../middleware/verifyToken')
 
 
 router.get("/", (req, res, next) => {
 
   Project
     .find()
+    .select({ title: 1, client: 1, description: 1, technologies: 1, link: 1, imageUrl: 1, owner: 1 })
     .then(response => res.json(response))
     .catch(err => next(err));
 });
